@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="flight-data-processing-kafka-streams">
+    <output-path>$PROJECT_DIR$/out/artifacts/flight_data_processing_kafka_streams</output-path>
+    <root id="archive" name="flight-data-processing-kafka-streams.jar">
+      <element id="module-output" name="KafkaFlightStreams" />
+    </root>
+  </artifact>
+</component>

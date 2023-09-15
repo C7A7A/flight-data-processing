@@ -1,0 +1,111 @@
+=== 1. KAFKA SETUP
+
+kafka/bin/zookeeper-server-start.sh kafka/config/zookeeper.properties
+
+kafka/bin/kafka-server-start.sh kafka/config/server.properties
+
+=== 2. KAFKA TOPICS:
+
+kafka/bin/kafka-topics.sh --delete --bootstrap-server [::1]:9092 --topic flights-input
+kafka/bin/kafka-topics.sh --delete --bootstrap-server [::1]:9092 --topic flights-output
+kafka/bin/kafka-topics.sh --delete --bootstrap-server [::1]:9092 --topic airports-input
+kafka/bin/kafka-topics.sh --delete --bootstrap-server [::1]:9092 --topic airports-output
+
+kafka/bin/kafka-topics.sh --create --topic flights-input --bootstrap-server=[::1]:9092
+kafka/bin/kafka-topics.sh --create --topic flights-output --bootstrap-server=[::1]:9092
+kafka/bin/kafka-topics.sh --create --topic airports-input --bootstrap-server=[::1]:9092 --config cleanup.policy=compact
+kafka/bin/kafka-topics.sh --create --topic airports-output --bootstrap-server [::1]:9092 
+
+kafka/bin/kafka-topics.sh --bootstrap-server=[::1]:9092 --list
+
+kafka/bin/kafka-console-producer.sh --bootstrap-server [::1]:9092 --topic flights-input
+
+cat /mnt/c/Program\ Files/studia/studia_pp/pp_psdsbd/KafkaStreamsProject/data/airports/airports.csv | awk -F ',' '{print $5 ":" $1 "," $2 "," $3 "," $4 "," $5 "," $6 "," $7 "," $8 "," $9 "," $10 "," $11 "," $12 "," $13 "," $14 ""}' | kafka/bin/kafka-console-producer.sh --bootstrap-server [::1]:9092 --topic airports-input --property key.separator=: --property parse.key=true
+
+kafka/bin/kafka-console-consumer.sh \
+--bootstrap-server [::1]:9092 \
+--topic flights-output \
+--formatter kafka.tools.DefaultMessageFormatter \
+--property print.key=true \
+--property print.value=true \
+
+kafka/bin/kafka-console-consumer.sh \
+--bootstrap-server [::1]:9092 \
+--topic airports-output \
+--formatter kafka.tools.DefaultMessageFormatter \
+--property print.key=true \
+--property print.value=true \
+
+
+=== 3. KAFKA PRODUCER
+
+java -cp kafka/libs/*:/mnt/c/'Program Files'/studia/studia_pp/pp_psdsbd/KafkaProducer/out/artifacts/KafkaProducer/KafkaProducer.jar \
+org.example.bigdata.TestProducer /mnt/c/'Program Files'/studia/studia_pp/pp_psdsbd/KafkaStreamsProject/data/test 15 flights-input \
+1 [::1]:9092
+
+=== OTHER
+
+kafka/bin/kafka-console-consumer.sh --bootstrap-server [::1]:9092 --topic flights-output
+kafka/bin/kafka-console-consumer.sh --bootstrap-server [::1]:9092 --topic airports-input --from-beginning
+
+cat /mnt/c/Program\ Files/studia/studia_pp/pp_psdsbd/KafkaStreamsProject/data/airports/airports.csv | kafka/bin/kafka-console-producer.sh --bootstrap-server [::1]:9092 --topic airports-input
+
+cat /mnt/c/Program\ Files/studia/studia_pp/pp_psdsbd/KafkaStreamsProject/data/airports/airports.csv | awk -F ',' '{print $5 ": \"" $1 "," $2 "," $3 "," $4 "," $6 "," $7 "," $8 "," $9 "," $10 "," $11 "," $12 "," $13 "," $14 "\""}' 
+
+ls /mnt/c/Program\ Files/studia/studia_pp/pp_psdsbd/KafkaStreamsProject/data/airports/airports.csv
+
+cd /mnt/c/'Program Files'/studia/studia_pp/pp_psdsbd/KafkaProducer/out/artifacts/KafkaProducer
+
+ls /mnt/c/'Program Files'/studia/studia_pp/pp_psdsbd/KafkaStreamsProject/data/test
+
+ls /mnt/c/'Program Files'/studia/studia_pp/pp_psdsbd/KafkaProducer/out/artifacts/KafkaProducer/KafkaProducer.jar
+
+kafka/bin/kafka-consumer-groups.sh --bootstrap-server [::1]:9092 --list
+
+kafka/bin/kafka-console-producer.sh --bootstrap-server [::1]:9092 --topic airports-input --property "parse.key=true" --property "key.separator=:"
+
+DL,1560,N3743H,ANC,SEA,2015-01-01T00:45:00.000Z,4,210,2015-01-01 05:15:00,2015-01-01 00:31:00,25,"","","","","","","","","","","","",2015-01-01 00:31:00,D
+
+DL,1173,N826DN,LAS,ATL,2015-01-01T00:30:00.000Z,4,221,2015-01-01 01:22:00,2015-01-01 00:33:00,12,"","","","","","","","","","","","",2015-01-01 00:33:00,D
+
+DL,2324,N3751B,SLC,ATL,2015-01-01T00:40:00.000Z,4,215,2015-01-01 06:15:00,2015-01-01 00:34:00,18,"","","","","","","","","","","","",2015-01-01 00:34:00,D
+
+DL,1434,N547US,LAX,MSP,2015-01-01T00:35:00.000Z,4,214,2015-01-01 06:09:00,2015-01-01 00:35:00,18,"","","","","","","","","","","","",2015-01-01 00:35:00,D
+
+DL,2440,N651DL,SEA,MSP,2015-01-01T00:40:00.000Z,4,189,2015-01-01 01:49:00,2015-01-01 00:39:00,28,"","","","","","","","","","","","",2015-01-01 00:39:00,D
+
+DL,2336,N958DN,DEN,ATL,2015-01-01T00:30:00.000Z,4,173,2015-01-01 05:23:00,2015-01-01 00:24:00,12,1199,4,2015-01-01 04:53:00,0,0,"","","","","","","",2015-01-01 04:53:00,A
+
+NK,972,N606NK,PHX,DFW,2015-01-01T01:59:00.000Z,4,123,2015-01-01 05:02:00,2015-01-01 01:58:00,11,868,11,2015-01-01 05:03:00,0,0,TEST,666,666,666,666,666,TEST,2015-01-01 05:03:00,A
+
+HA,205,N484HA,OGG,HNL,2015-01-01T06:09:00.000Z,4,32,2015-01-01 06:41:00,2015-01-01 06:01:00,8,"","","","","","","","","","","","",2015-01-01 06:01:00,D
+
+WN,4822,N293WN,LAS,BWI,2015-01-01T06:00:00.000Z,4,270,2015-01-01 13:30:00,2015-01-01 06:02:00,10,"","","","","","","","","","","","",2015-01-01 06:02:00,D
+
+DL,977,N988DL,ORD,ATL,2015-01-01T06:00:00.000Z,4,127,2015-01-01 09:07:00,2015-01-01 06:02:00,19,"","","","","","","","","","","","",2015-01-01 06:02:00,D
+
+UA,1689,N39461,EWR,SFO,2015-01-01T06:01:00.000Z,4,399,2015-01-01 09:40:00,2015-01-01 06:02:00,11,"","","","","","","","","","","","",2015-01-01 06:02:00,D
+
+UA,732,N824UA,SEA,ORD,2015-01-01T06:20:00.000Z,4,236,2015-01-01 12:16:00,2015-01-01 06:13:00,13,"","","","","","","","","","","","",2015-01-01 06:13:00,D
+
+DL,1934,N958DL,CVG,ATL,2015-01-04T14:15:00.000Z,7,96,2015-01-04 15:51:00,2015-01-04 14:11:00,10,"","","","","","","","","","","","",2015-01-04 14:11:00,D
+
+3415: 3415,Hilo International Airport,Hilo,United States,ITO,PHTO,19.721399307250977,-155.04800415039062,38,-10,N,Pacific/Honolulu,airport,HI
+
+3437,Fort Smith Regional Airport,Fort Smith,United States,FSM,KFSM,35.33660125732422,-94.36740112304688,469,-6,A,America/Chicago,airport,AR
+
+3442,Grand Forks International Airport,Grand Forks,United States,GFK,KGFK,47.949299,-97.176102,845,-6,A,America/Chicago,airport,ND
+
+3447,Trenton Mercer Airport,Trenton,United States,TTN,KTTN,40.27669906616211,-74.8134994506836,213,-5,A,America/New_York,airport,NJ
+
+"this is a pony"
+"this is a horse and pony"
+
+java -cp /home/mateusz/kafka/libs/*:flight-data-processing-kafka-streams.jar \
+org.example.ProcessFlightApplication 120 4 C [::1]:9092
+
+listeners=PLAINTEXT://[::1]:9092
+delete.topic.enable = true
+
+/tmp/zookeeper
+/tmp/kafka-logs
